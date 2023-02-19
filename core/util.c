@@ -1,18 +1,13 @@
 //
 // Created by roza0 on 2/14/2023.
 //
-#include <SDL_syswm.h>
 #include "util.h"
 
-#define ID_LOADROM 1
-#define ID_ABOUT 2
-#define ID_EXIT 3
-#define ID_CONTROLS 4
 HMENU hHelp;
-HMENU hEdit;
 HMENU hFile;
+HMENU hEmulation;
+HMENU hSettings;
 HMENU hMenuBar;
-
 
 //Function which retrieves the address/Handle of an SDL window
 //Also retrieves the specific subsystem used by SDL to create that window which is platform specific (Windows, MAC OS x, IOS, etc...)
@@ -27,22 +22,40 @@ HWND getSDLWinHandle(SDL_Window* win)
     return (infoWindow.info.win.window);
 }
 
+UINT getSDLWinMsg(SDL_Window* win)
+{
+    SDL_SysWMmsg msgWindow;
+    SDL_SysWMinfo infoWindow;
+    SDL_VERSION(&infoWindow.version);
+//    if (!SDL_GetWindowWMInfo(win, &msgWindow))
+//    {
+//        return 0;
+//    }
+//    return (infoWindow.);
+    return 1;
+}
+
 //Initializes the native windows drop down menu elements of the window
 void ActivateMenu(HWND windowRef)
 {
     hMenuBar = CreateMenu();
     hFile = CreateMenu();
-    hEdit = CreateMenu();
+    hEmulation = CreateMenu();
+    hSettings = CreateMenu();
     hHelp = CreateMenu();
 
     AppendMenu(hMenuBar, MF_POPUP, (UINT_PTR)hFile, "File");
-    AppendMenu(hMenuBar, MF_POPUP, (UINT_PTR)hEdit, "Edit");
+    AppendMenu(hMenuBar, MF_POPUP, (UINT_PTR)hEmulation, "Emulation");
+    AppendMenu(hMenuBar, MF_POPUP, (UINT_PTR)hSettings, "Settings");
     AppendMenu(hMenuBar, MF_POPUP, (UINT_PTR)hHelp, "Help");
 
     AppendMenu(hFile, MF_STRING, ID_LOADROM, "Load ROM");
     AppendMenu(hFile, MF_STRING, ID_EXIT, "Exit");
 
-    AppendMenu(hEdit, MF_STRING, ID_CONTROLS, "Configure Controls");
+    AppendMenu(hEmulation, MF_STRING, ID_RESET, "Reset");
+    AppendMenu(hEmulation, MF_STRING, ID_SHUTDOWN, "Shutdown");
+
+    AppendMenu(hSettings, MF_STRING, ID_SETTINGS, "Settings...");
 
     AppendMenu(hHelp, MF_STRING, ID_ABOUT, "About");
 
@@ -60,7 +73,7 @@ void GenerateConfig(){
     fclose(fp);
 }
 
-void GetConfig(){
+void GetConfig(){ // TODO: change void to Config struct and return the config
     FILE *fp = fopen(CONFIG_FILE, "r");
     if (fp == NULL)
     {
@@ -99,4 +112,12 @@ void GetConfig(){
     }
 }
 
-
+int OpenFileDialog(char filetype[], char title[]){
+    OPENFILENAME ofn;
+    memset(&ofn, 0, sizeof(ofn));
+    ofn.lStructSize = sizeof(ofn);
+    ofn.lpstrFilter = filetype;
+    if(!GetOpenFileName(&ofn))
+        return 0;
+    return 1;
+}

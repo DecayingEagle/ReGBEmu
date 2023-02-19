@@ -1,4 +1,3 @@
-//Using SDL and standard IO
 #include <SDL.h>
 #include <windows.h>
 #include <stdbool.h>
@@ -45,6 +44,7 @@ int main(int argc, char* args[]) {
     SDL_UpdateWindowSurface(window);
     SDL_EventState(SDL_SYSWMEVENT, SDL_ENABLE);
     SDL_bool done = SDL_FALSE;
+    OpenFileDialog(".txt", "Load rom");
     while (!done) {
         if (input()) {
             done = SDL_TRUE;
